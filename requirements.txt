@@ -3,5 +3,5 @@ torch
 pdfplumber==0.10.3
 sentence-transformers==2.5.1
 numpy>=1.24.0
-faiss-cpu==1.7.2
+faiss-cpu
 streamlit
