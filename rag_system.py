@@ -65,3 +65,4 @@ if __name__ == "__main__":
     print("\nGenerando respuesta...")
     respuesta = responder_pregunta(pregunta_ejemplo, k=3)
     print("\nRespuesta FINAL del LLM:", respuesta)
+
