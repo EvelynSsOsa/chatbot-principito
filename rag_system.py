@@ -1,5 +1,3 @@
-
-   
 # Este script requiere las siguientes bibliotecas:
 # pip install faiss-cpu numpy transformers torch sentence-transformers
 
@@ -58,12 +56,12 @@ def responder_pregunta(pregunta_usuario, k=2):
         f"Pregunta: {pregunta_usuario}\n\n"
         f"Contexto:\n{contexto}\n\n"
         f"Respuesta:"
-    ) 
-   
-   # Truncar si excede longitud segura para gpt-neo
-max_prompt_chars = 3500
-if len(prompt) > max_prompt_chars:
-    prompt = prompt[:max_prompt_chars]
+    )
+
+    # Truncar si excede longitud segura para gpt-neo
+    max_prompt_chars = 3500
+    if len(prompt) > max_prompt_chars:
+        prompt = prompt[:max_prompt_chars]
 
     print("\n--- Generando respuesta con modelo de texto ---")
     respuesta_obj = generator(
