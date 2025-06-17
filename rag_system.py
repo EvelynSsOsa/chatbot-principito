@@ -53,26 +53,12 @@ def responder_pregunta(pregunta_usuario, k=3):
         else:
             return "Error: No se recuperaron fragmentos."
 
-    # --- PROMPT SIMPLIFICADO ---
-    prompt = f"""Contexto:
-{contexto_para_llm}
+   print("\n--- Realizando pregunta con pipeline QA ---")
+respuesta_obj = generator(
+    question=pregunta_usuario,
+    context=contexto_para_llm
+)
 
-Pregunta: {pregunta_usuario}
-
-Respuesta:"""
-    
-    print("\n--- PROMPT ENVIADO AL LLM (SIMPLIFICADO) ---")
-    print(prompt)
-    print("--- FIN DEL PROMPT ---")
-    
-    # --- GENERACIÓN CON do_sample=False ---
-    respuesta_obj = generator(
-        prompt,
-        max_new_tokens=80,
-        num_return_sequences=1,
-        do_sample=False,  # Greedy decoding
-        pad_token_id=generator.tokenizer.eos_token_id 
-    )
     
     respuesta_texto_completo = respuesta_obj[0]['generated_text']
     
