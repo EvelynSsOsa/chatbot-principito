@@ -21,8 +21,12 @@ print("Cargando modelo de embeddings...")
 embedding_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 
 # Cargar el modelo generativo
-print("Cargando modelo generativo...")
-generator = pipeline('text-generation', model='EleutherAI/gpt-neo-125M') 
+#print("Cargando modelo generativo...")
+#generator = pipeline('text-generation', model='EleutherAI/gpt-neo-125M') 
+# Cargar el modelo QA
+print("Cargando modelo de pregunta-respuesta...")
+generator = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
+
 
 def responder_pregunta(pregunta_usuario, k=3):
     print(f"Buscando los {k} fragmentos más relevantes para: '{pregunta_usuario}'")
