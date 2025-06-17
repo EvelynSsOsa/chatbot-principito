@@ -31,23 +31,14 @@ def responder_pregunta(pregunta_usuario, k=3):
 
     distances, indices = index.search(query_embedding, k)
 
-    contexto_para_llm = None
-    idx_faiss_deseado = 32
+    # Concatenar los k fragmentos más relevantes
+    print(f"\n--- Recuperando los {k} fragmentos más relevantes ---")
+    fragmentos = [text_chunks[idx] for idx in indices[0] if idx < len(text_chunks)]
 
-    print(f"\n--- Buscando fragmento con Índice FAISS: {idx_faiss_deseado} entre los recuperados ---")
-    for i, idx_recuperado in enumerate(indices[0]):
-        print(f"Comparando con fragmento recuperado {i+1} (Índice FAISS: {idx_recuperado})")
-        if idx_recuperado == idx_faiss_deseado:
-            contexto_para_llm = text_chunks[idx_recuperado]
-            print(f"¡Fragmento deseado (Índice FAISS {idx_faiss_deseado}) encontrado y seleccionado!")
-            break
+    if not fragmentos:
+        return "Error: No se recuperaron fragmentos."
 
-    if contexto_para_llm is None:
-        print(f"ADVERTENCIA: No se encontró el fragmento con Índice FAISS {idx_faiss_deseado}. Usando el primer fragmento recuperado como fallback.")
-        if indices[0].size > 0:
-            contexto_para_llm = text_chunks[indices[0][0]]
-        else:
-            return "Error: No se recuperaron fragmentos."
+    contexto_para_llm = "\n\n".join(fragmentos)
 
     print("\n--- Realizando pregunta con pipeline QA ---")
     respuesta_obj = qa_pipeline({
@@ -65,4 +56,5 @@ if __name__ == "__main__":
     print("\nGenerando respuesta...")
     respuesta = responder_pregunta(pregunta_ejemplo, k=3)
     print("\nRespuesta FINAL del LLM:", respuesta)
+
 
