@@ -58,7 +58,12 @@ def responder_pregunta(pregunta_usuario, k=3):
         f"Pregunta: {pregunta_usuario}\n\n"
         f"Contexto:\n{contexto}\n\n"
         f"Respuesta:"
-    )
+    ) 
+   
+   # Truncar si excede longitud segura para gpt-neo
+max_prompt_chars = 3500
+if len(prompt) > max_prompt_chars:
+    prompt = prompt[:max_prompt_chars]
 
     print("\n--- Generando respuesta con modelo de texto ---")
     respuesta_obj = generator(
@@ -83,5 +88,5 @@ if __name__ == "__main__":
     pregunta_ejemplo = "¿Qué aprendió el principito del zorro sobre domesticar?"
     print("\nPregunta:", pregunta_ejemplo)
     print("\nGenerando respuesta...")
-    respuesta = responder_pregunta(pregunta_ejemplo, k=3)
+    respuesta = responder_pregunta(pregunta_ejemplo, k=2)
     print("\nRespuesta FINAL del LLM:", respuesta)
