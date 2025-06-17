@@ -36,7 +36,7 @@ generator = pipeline(
 )
 
 # --- Función para responder preguntas ---
-def responder_pregunta(pregunta_usuario, k=3):
+def responder_pregunta(pregunta_usuario, k=2):
     print(f"Buscando los {k} fragmentos más relevantes para: '{pregunta_usuario}'")
     
     # Codificar la pregunta
