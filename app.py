@@ -16,3 +16,4 @@ if pregunta:
         respuesta = responder_pregunta(pregunta)
     st.success("Respuesta:")
     st.write(respuesta)
+
