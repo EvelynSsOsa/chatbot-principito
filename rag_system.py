@@ -20,13 +20,9 @@ with open("principito_text_chunks.pkl", "rb") as f:
 print("Cargando modelo de embeddings...")
 embedding_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 
-# Cargar el modelo generativo
-#print("Cargando modelo generativo...")
-#generator = pipeline('text-generation', model='EleutherAI/gpt-neo-125M') 
 # Cargar el modelo QA
 print("Cargando modelo de pregunta-respuesta...")
-generator = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
-
+qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 
 def responder_pregunta(pregunta_usuario, k=3):
     print(f"Buscando los {k} fragmentos más relevantes para: '{pregunta_usuario}'")
@@ -34,9 +30,9 @@ def responder_pregunta(pregunta_usuario, k=3):
     query_embedding = np.array([query_embedding], dtype=np.float32)
 
     distances, indices = index.search(query_embedding, k)
-    
+
     contexto_para_llm = None
-    idx_faiss_deseado = 32 
+    idx_faiss_deseado = 32
 
     print(f"\n--- Buscando fragmento con Índice FAISS: {idx_faiss_deseado} entre los recuperados ---")
     for i, idx_recuperado in enumerate(indices[0]):
@@ -44,42 +40,28 @@ def responder_pregunta(pregunta_usuario, k=3):
         if idx_recuperado == idx_faiss_deseado:
             contexto_para_llm = text_chunks[idx_recuperado]
             print(f"¡Fragmento deseado (Índice FAISS {idx_faiss_deseado}) encontrado y seleccionado!")
-            break 
-    
+            break
+
     if contexto_para_llm is None:
         print(f"ADVERTENCIA: No se encontró el fragmento con Índice FAISS {idx_faiss_deseado}. Usando el primer fragmento recuperado como fallback.")
-        if indices[0].size > 0 : 
+        if indices[0].size > 0:
             contexto_para_llm = text_chunks[indices[0][0]]
         else:
             return "Error: No se recuperaron fragmentos."
 
-   print("\n--- Realizando pregunta con pipeline QA ---")
-respuesta_obj = generator(
-    question=pregunta_usuario,
-    context=contexto_para_llm
-)
+    print("\n--- Realizando pregunta con pipeline QA ---")
+    respuesta_obj = qa_pipeline({
+        "question": pregunta_usuario,
+        "context": contexto_para_llm
+    })
 
-    
-    respuesta_texto_completo = respuesta_obj[0]['generated_text']
-    
-    respuesta_generada = "" 
-    if prompt in respuesta_texto_completo:
-        respuesta_generada = respuesta_texto_completo.split(prompt, 1)[1].strip()
-    else:
-        partes = respuesta_texto_completo.split("Respuesta:")
-        if len(partes) > 1:
-            respuesta_generada = partes[-1].strip()
-        else: 
-            respuesta_generada = respuesta_texto_completo.strip() 
-
-    if pregunta_usuario.lower() in respuesta_generada.lower() and len(respuesta_generada.split()) < len(pregunta_usuario.split()) + 6:
-        print("ADVERTENCIA: La respuesta parece ser una repetición de la pregunta o muy corta.")
-    
+    respuesta_generada = respuesta_obj['answer']
     return respuesta_generada
 
 # Ejemplo de uso
-pregunta_ejemplo = "¿Qué aprendió el principito del zorro sobre domesticar?"
-print("\nPregunta:", pregunta_ejemplo)
-print("\nGenerando respuesta...")
-respuesta = responder_pregunta(pregunta_ejemplo, k=3)
-print("\nRespuesta FINAL del LLM:", respuesta)
+if __name__ == "__main__":
+    pregunta_ejemplo = "¿Qué aprendió el principito del zorro sobre domesticar?"
+    print("\nPregunta:", pregunta_ejemplo)
+    print("\nGenerando respuesta...")
+    respuesta = responder_pregunta(pregunta_ejemplo, k=3)
+    print("\nRespuesta FINAL del LLM:", respuesta)
